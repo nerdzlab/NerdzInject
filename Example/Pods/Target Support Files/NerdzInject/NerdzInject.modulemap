@@ -1,0 +1,6 @@
+framework module NerdzInject {
+  umbrella header "NerdzInject-umbrella.h"
+
+  export *
+  module * { export * }
+}

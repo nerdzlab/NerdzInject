@@ -1,0 +1,16 @@
+PODS:
+  - NerdzInject (0.1.0)
+
+DEPENDENCIES:
+  - NerdzInject (from `../`)
+
+EXTERNAL SOURCES:
+  NerdzInject:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  NerdzInject: 4d10e6862f925a1055b9b3fe00e28a2100b3a189
+
+PODFILE CHECKSUM: 668bd25f7aba0418183dd22061e9ade9b722b425
+
+COCOAPODS: 1.9.2
