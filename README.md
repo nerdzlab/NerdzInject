@@ -10,7 +10,6 @@ You will need to register your instances or closured in `NerdzInject` class.
 
 ```swift
 NerdzInject.shared.register(object: myInstance)
-}
 ```
 
 ### Registering instance with specifying class
@@ -19,7 +18,6 @@ This method should be used when you want to registed some inherited class instan
 
 ```swift
 NerdzInject.shared.register(object: inheritedClassInstance, for: BaseClass.self)
-}
 ```
 
 ### Registering instance with specifying identifier
@@ -28,7 +26,6 @@ This method should be used when you want to registed some instance for use when 
 
 ```swift
 NerdzInject.shared.register(object: myInstance, for: "my_custom_identifier")
-}
 ```
 
 ### Registering with closure
@@ -86,7 +83,7 @@ You can use [CocoaPods](https://cocoapods.org) dependency manager to install `Ne
 In your `Podfile` spicify:
 
 ```ruby
-pod 'NerdzInject', '~> 1.0.1'
+pod 'NerdzInject', '~> 1.0.2'
 ```
 
 ### Swift Package Manager
