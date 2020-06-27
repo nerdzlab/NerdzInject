@@ -15,7 +15,7 @@ class Inject<T> {
     
     var wrappedValue: T? {
         get {
-            NerdzInject.shared.resolve(for: identifier)
+            NerdzInject.shared.resolve(by: identifier)
         }
         
         set { 
@@ -23,7 +23,7 @@ class Inject<T> {
                 return
             }
             
-            NerdzInject.shared.register(newValue, for: identifier)
+            NerdzInject.shared.register(object: newValue, for: identifier)
         }
     }
     
