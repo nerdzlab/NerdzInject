@@ -8,12 +8,12 @@
 import Foundation
 
 @propertyWrapper 
-class Inject<T> {
+public class Inject<T> {
     
     private let identifier: String
     private let allowRegister: Bool
     
-    var wrappedValue: T? {
+    public var wrappedValue: T? {
         get {
             NerdzInject.shared.resolve(by: identifier)
         }
@@ -27,17 +27,17 @@ class Inject<T> {
         }
     }
     
-    init(_ identifier: String, allowRegister: Bool = false) {
+    public init(_ identifier: String, allowRegister: Bool = false) {
         self.identifier = identifier
         self.allowRegister = allowRegister
     }
     
-    convenience init<V>(_ type: V.Type, allowRegister: Bool = false) {
+    public convenience init<V>(_ type: V.Type, allowRegister: Bool = false) {
         let identifier = String(describing: V.self)
         self.init(identifier, allowRegister: allowRegister)
     }
     
-    convenience init(allowRegister: Bool = false) {
+    public convenience init(allowRegister: Bool = false) {
         let identifier = String(describing: T.self)
         self.init(identifier, allowRegister: allowRegister)
     }
