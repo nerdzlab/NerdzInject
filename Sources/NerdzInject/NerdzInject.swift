@@ -6,7 +6,7 @@ public final class NerdzInject {
     
     // MARK: - Singleton
     
-    static let shared = NerdzInject()
+    public static let shared = NerdzInject()
     
     private init() { }
     
