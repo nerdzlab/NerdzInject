@@ -70,7 +70,7 @@ public final class NerdzInject {
     
     // MARK: - Force Resolving
     
-    public func forceRespolve<T>() -> T {
+    public func forceResolve<T>() -> T {
         resolve()!
     }
     
