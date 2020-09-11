@@ -7,25 +7,9 @@
 
 import Foundation
 
-@propertyWrapper 
-public class Inject<T> {
-    
-    private let identifier: String
-    private let allowRegister: Bool
-    
-    public var wrappedValue: T? {
-        get {
-            NerdzInject.shared.resolve(by: identifier)
-        }
-        
-        set { 
-            guard allowRegister else {
-                return
-            }
-            
-            NerdzInject.shared.register(object: newValue, for: identifier)
-        }
-    }
+public class BaseInject<T> {
+    fileprivate let identifier: String
+    fileprivate let allowRegister: Bool
     
     public init(_ identifier: String, allowRegister: Bool = false) {
         self.identifier = identifier
@@ -41,4 +25,39 @@ public class Inject<T> {
         let identifier = String(describing: T.self)
         self.init(identifier, allowRegister: allowRegister)
     }
+}
+
+@propertyWrapper 
+public class Inject<T>: BaseInject<T> {
+    public var wrappedValue: T? {
+        get {
+            NerdzInject.shared.resolve(by: identifier)
+        }
+        
+        set { 
+            guard allowRegister else {
+                return
+            }
+            
+            NerdzInject.shared.register(object: newValue, for: identifier)
+        }
+    }
 } 
+
+@propertyWrapper 
+public class ForceInject<T>: BaseInject<T> {
+    
+    public var wrappedValue: T {
+        get {
+            NerdzInject.shared.forceResolve(by: identifier)
+        }
+        
+        set { 
+            guard allowRegister else {
+                return
+            }
+            
+            NerdzInject.shared.register(object: newValue, for: identifier)
+        }
+    }
+}

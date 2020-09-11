@@ -68,6 +68,20 @@ public final class NerdzInject {
         return instance
     }
     
+    // MARK: - Force Resolving
+    
+    public func forceRespolve<T>() -> T {
+        resolve()!
+    }
+    
+    public func forceResolve<T, V>(by type: V.Type) -> T {
+        resolve(by: type)!
+    }
+    
+    public func forceResolve<T>(by identifier: String) -> T {
+        resolve(by: identifier)!
+    }
+    
     // MARK: - Removing
 
     @discardableResult
