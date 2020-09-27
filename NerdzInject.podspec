@@ -2,7 +2,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'NerdzInject'
-  s.version          = '1.0.2'
+  s.version          = '1.0.8'
   s.summary          = 'A CSS-like way of creation and applying styles to view components'
   s.homepage         = 'https://github.com/nerdzlab/NerdzInject'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
