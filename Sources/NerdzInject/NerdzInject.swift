@@ -1,5 +1,4 @@
 /// A class that registers and resolve all the dependencies
-
 public final class NerdzInject {
     private typealias RegistrationInfo = (isSingleton: Bool, closure: () -> Any)
     
