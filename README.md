@@ -2,6 +2,8 @@
 
 NerdzInject library allow to easily use Dependency Injection patter in your Swift project.
 
+[Documentation](/docs/index.html)
+
 ## Example
 
 You will need to register your instances or closured in `NerdzInject` class.
@@ -75,20 +77,9 @@ let success = NerdzInject.shared.remove(by: identifier)
 NerdzInject.shared.remove(by: MyClass.self)
 ```
 
-## Installation
+## Installation Swift Package Manager
 
-### CocoaPods
-
-You can use [CocoaPods](https://cocoapods.org) dependency manager to install `NerdzInject`.
-In your `Podfile` spicify:
-
-```ruby
-pod 'NerdzInject', '~> 1.0.2'
-```
-
-### Swift Package Manager
-
-To add NerdzStyle to a [Swift Package Manager](https://swift.org/package-manager/) based project, add:
+To add NerdzInject to a [Swift Package Manager](https://swift.org/package-manager/) based project, add:
 
 ```swift
 .package(url: "https://github.com/nerdzlab/NerdzInject")
