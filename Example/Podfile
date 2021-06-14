@@ -1,6 +1,0 @@
-use_frameworks!
-target 'NerdzInject_Tests' do
-  pod 'NerdzInject', :path => '../'
-  
-  
-end
