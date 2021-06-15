@@ -49,7 +49,7 @@ import Foundation
                 return
             }
             
-            NerdzInject.shared.register(object: newValue, for: identifier)
+            NerdzInject.shared.registerObject(newValue, for: identifier)
         }
     }
 } 
@@ -96,7 +96,7 @@ import Foundation
                 return
             }
             
-            NerdzInject.shared.register(object: newValue, for: identifier)
+            NerdzInject.shared.registerObject(newValue, for: identifier)
         }
     }
 }

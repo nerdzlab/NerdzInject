@@ -15,7 +15,7 @@ public final class NerdzInject {
     
     /// Register an object based on instance type
     /// - Parameter object: Registered instance that needs to be resolved later 
-    public func register<T>(object: T) {
+    public func registerObject<T>(_ object: T) {
         register(closure: { object })
     }
     
@@ -24,7 +24,7 @@ public final class NerdzInject {
     /// - Parameters:
     ///   - object: Registered instance that needs to be resolved later 
     ///   - type: A type to what this instance needs to be resolved
-    public func register<T, V>(object: T, for type: V.Type) {
+    public func registerObject<T, V>(_ object: T, for type: V.Type) {
         register(for: type) { object }
     }
     
@@ -32,7 +32,7 @@ public final class NerdzInject {
     /// - Parameters:
     ///   - object: Registered instance that needs to be resolved later
     ///   - identifier: Unique dentifier that needs to be used for resolving instance in future
-    public func register<T>(object: T, for identifier: String) {
+    public func registerObject<T>(_ object: T, for identifier: String) {
         register(for: identifier) { object }
     }
     
@@ -100,7 +100,7 @@ public final class NerdzInject {
         
         if info.isSingleton {
             remove(by: identifier)
-            register(object: instance, for: identifier)
+            registerObject(instance, for: identifier)
         }
         
         return instance

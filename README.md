@@ -6,20 +6,20 @@ NerdzInject library allow to easily use Dependency Injection patter in your Swif
 
 ## Example
 
-You will need to register your instances or closured in `NerdzInject` class.
+You will need to register your instances or closures in `NerdzInject` class.
 
 ### Registering instance
 
 ```swift
-NerdzInject.shared.register(object: myInstance)
+NerdzInject.shared.registerObject(_ object: myInstance)
 ```
 
-### Registering instance with specifying class
+### Registering instance with specifying class type
 
 This method should be used when you want to registed some inherited class instance for use when somebody will be resolving base class
 
 ```swift
-NerdzInject.shared.register(object: inheritedClassInstance, for: BaseClass.self)
+NerdzInject.shared.registerObject(_ object: inheritedClassInstance, for: BaseClass.self)
 ```
 
 ### Registering instance with specifying identifier
@@ -27,7 +27,7 @@ NerdzInject.shared.register(object: inheritedClassInstance, for: BaseClass.self)
 This method should be used when you want to registed some instance for use when somebody will be resolving by identifier
 
 ```swift
-NerdzInject.shared.register(object: myInstance, for: "my_custom_identifier")
+NerdzInject.shared.registerObject(_ object: myInstance, for: "my_custom_identifier")
 ```
 
 ### Registering with closure
@@ -66,6 +66,16 @@ Or resolving by property wrapper `Inject` in similar ways.
 @Inject var resolvedByInstanceType: MyType?
 @Inject(MyType.self) var resolvedByProvidedType: MyBaseType?
 @Inject("identifier") var resolvedByIdentifier: MyType?
+```
+
+### ForceInject
+
+You can use `ForceInject` property wrapper to avoid optional types on resolving. From previous example we will get:
+
+```swift
+@ForceInject var resolvedByInstanceType: MyType
+@ForceInject(MyType.self) var resolvedByProvidedType: MyBaseType
+@ForceInject("identifier") var resolvedByIdentifier: MyType
 ```
 
 ### Removing instances
