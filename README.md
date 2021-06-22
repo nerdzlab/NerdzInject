@@ -2,7 +2,7 @@
 
 NerdzInject library allow to easily use Dependency Injection patter in your Swift project.
 
-## [Documentation](https://nerdz-inject-doc.vercel.app)
+## [Documentation](https://nerdzinject.web.app)
 
 ## Example
 
