@@ -15,8 +15,10 @@ public final class NerdzInject {
     
     /// Register an object based on instance type
     /// - Parameter object: Registered instance that needs to be resolved later 
-    public func registerObject<T>(_ object: T) {
+    @discardableResult
+    public func registerObject<T>(_ object: T) -> T {
         register(closure: { object })
+        return object
     }
     
     /// Register an object for another  type
@@ -24,16 +26,20 @@ public final class NerdzInject {
     /// - Parameters:
     ///   - object: Registered instance that needs to be resolved later 
     ///   - type: A type to what this instance needs to be resolved
-    public func registerObject<T, V>(_ object: T, for type: V.Type) {
+    @discardableResult
+    public func registerObject<T, V>(_ object: T, for type: V.Type) -> T {
         register(for: type) { object }
+        return object
     }
     
     /// Register an object that might be 
     /// - Parameters:
     ///   - object: Registered instance that needs to be resolved later
     ///   - identifier: Unique dentifier that needs to be used for resolving instance in future
-    public func registerObject<T>(_ object: T, for identifier: String) {
+    @discardableResult
+    public func registerObject<T>(_ object: T, for identifier: String) -> T {
         register(for: identifier) { object }
+        return object
     }
     
     // MARK: - Registering(Closure)
