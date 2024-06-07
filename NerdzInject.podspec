@@ -2,7 +2,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'NerdzInject'
-  s.version          = '1.1.1'
+  s.version          = '1.1.3'
   s.summary          = 'A wrapper on top of URLSession and URLRequest to simplify creating and managing network requests'
   s.homepage         = 'https://github.com/nerdzlab/NerdzInject'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
@@ -13,5 +13,4 @@ Pod::Spec.new do |s|
   s.swift_versions = ['5.0']
   s.source_files = 'Sources/**/*'
   
-  s.dependency 'TrustKit', '~> 2.0.0'
 end
