@@ -19,11 +19,23 @@ public final class NerdzInject: Sendable {
 
     /// The shared registry used throughout an app.
     ///
-    /// Register and resolve dependencies through this instance. The ``Inject``
-    /// and ``ForceInject`` property wrappers resolve against this same registry.
+    /// Register and resolve dependencies through this instance. Unless a scope
+    /// overrides ``current``, the ``Inject`` and ``ForceInject`` property
+    /// wrappers resolve against this same registry.
     public static let shared = NerdzInject()
 
-    private init() { }
+    /// The container the property wrappers capture when they are initialized.
+    ///
+    /// Defaults to ``shared``. Override it for a scope with
+    /// ``withDependencies(_:operation:)`` or ``withContainer(_:perform:)`` so a
+    /// unit test can resolve from an isolated container without mutating global
+    /// state.
+    @TaskLocal public static var current: NerdzInject = shared
+
+    /// Creates an empty container.
+    ///
+    /// Use this to build an isolated container, typically in a test.
+    public init() { }
 
     // MARK: - Registering(Object)
 
