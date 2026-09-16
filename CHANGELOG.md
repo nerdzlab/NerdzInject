@@ -21,6 +21,7 @@ Breaking release: CocoaPods support is removed (Swift Package Manager only), the
 - DocC documentation.
 - GitHub Actions CI (Linux) that runs build, test, and a strict-concurrency build.
 - Full Apple platform declarations in `Package.swift`.
+- Testable injection: an ambient `NerdzInject.current` container (`@TaskLocal`) that the property wrappers capture at initialization, a `withDependencies { configure } operation: { ... }` scope (plus a lower level `withContainer`), a `NerdzInjectTesting` product with a `.nerdzContainer` Swift Testing trait for isolated per-test containers, and a `DependencyResolver` protocol for constructor injection.
 
 ### Changed
 
