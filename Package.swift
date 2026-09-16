@@ -17,6 +17,9 @@ let package = Package(
         .library(
             name: "NerdzInject",
             targets: ["NerdzInject"]),
+        .library(
+            name: "NerdzInjectTesting",
+            targets: ["NerdzInjectTesting"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -28,8 +31,11 @@ let package = Package(
         .target(
             name: "NerdzInject",
             dependencies: []),
+        .target(
+            name: "NerdzInjectTesting",
+            dependencies: ["NerdzInject"]),
         .testTarget(
             name: "NerdzInjectTests",
-            dependencies: ["NerdzInject"])
+            dependencies: ["NerdzInject", "NerdzInjectTesting"])
     ]
 )
