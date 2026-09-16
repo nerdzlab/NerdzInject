@@ -157,7 +157,7 @@ import Testing
 import NerdzInject
 
 @Test func loadsProfile() {
-    NerdzInject.withDependencies {
+    withDependencies {
         $0.registerObject(ProfileRepositorySpy(), for: ProfileRepository.self)
     } operation: {
         let sut = ProfileViewModel()   // captures the fresh container

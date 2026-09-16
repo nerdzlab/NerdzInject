@@ -16,7 +16,7 @@ struct ScopeHelpersTests {
     @Test func testWhenWithDependenciesSyncShouldResolveConfiguredInstance() {
         let expectedTag = "sync"
 
-        let tag = NerdzInject.withDependencies {
+        let tag = withDependencies {
             $0.registerObject(Service(tag: expectedTag))
         } operation: {
             Holder().service.tag
@@ -27,7 +27,7 @@ struct ScopeHelpersTests {
     @Test func testWhenWithDependenciesAsyncShouldResolveConfiguredInstance() async {
         let expectedTag = "async"
 
-        let tag = await NerdzInject.withDependencies {
+        let tag = await withDependencies {
             $0.registerObject(Service(tag: expectedTag))
         } operation: { () async -> String in
             Holder().service.tag
@@ -38,7 +38,7 @@ struct ScopeHelpersTests {
     @Test func testWhenSutBuiltInScopeShouldRetainOverrideAfterScope() {
         let expectedTag = "sticky"
 
-        let holder = NerdzInject.withDependencies {
+        let holder = withDependencies {
             $0.registerObject(Service(tag: expectedTag))
         } operation: {
             Holder()
@@ -48,23 +48,12 @@ struct ScopeHelpersTests {
 
     @Test func testWhenWithDependenciesUsedShouldNotLeakToShared() {
         let expectedTag = "isolated"
-        NerdzInject.withDependencies {
+        withDependencies {
             $0.registerObject(Service(tag: expectedTag))
         } operation: {
             _ = Holder().service
         }
         let leaked: Service? = NerdzInject.shared.resolve()
         #expect(leaked == nil)
-    }
-
-    @Test func testWhenWithContainerSyncShouldResolveInsideScope() {
-        let expectedTag = "container"
-        let container = NerdzInject()
-        container.registerObject(Service(tag: expectedTag))
-
-        let tag = NerdzInject.withContainer(container) {
-            Holder().service.tag
-        }
-        #expect(tag == expectedTag)
     }
 }

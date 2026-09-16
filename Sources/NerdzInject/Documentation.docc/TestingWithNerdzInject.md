@@ -22,7 +22,7 @@ import Testing
 import NerdzInject
 
 @Test func loadsProfile() {
-    NerdzInject.withDependencies {
+    withDependencies {
         $0.registerObject(ProfileRepositorySpy(), for: ProfileRepository.self)
     } operation: {
         let sut = ProfileViewModel()
@@ -33,8 +33,7 @@ import NerdzInject
 
 Because the container is fresh, a dependency the test forgot to register fails
 loudly rather than resolving app wide state. There is an `async` overload for
-asynchronous operations, and a lower level `withContainer(_:perform:)` for when
-you have already built a container.
+asynchronous operations.
 
 ## Using the .nerdzContainer trait
 

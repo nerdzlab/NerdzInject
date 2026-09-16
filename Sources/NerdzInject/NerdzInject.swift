@@ -27,8 +27,8 @@ public final class NerdzInject: Sendable {
     /// The container the property wrappers capture when they are initialized.
     ///
     /// Defaults to ``shared``. Override it for a scope with `withDependencies`
-    /// or `withContainer` so a unit test can resolve from an isolated container
-    /// without mutating global state.
+    /// so a unit test can resolve from an isolated container without mutating
+    /// global state.
     @TaskLocal public static var current: NerdzInject = shared
 
     /// Creates an empty container.
