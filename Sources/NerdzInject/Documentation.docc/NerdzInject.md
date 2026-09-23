@@ -36,6 +36,12 @@ which caches the instance built on first resolution and reuses it afterwards.
 - <doc:UsingPropertyWrappers>
 - ``NerdzInject/shared``
 
+### Testing
+
+- <doc:TestingWithNerdzInject>
+- ``NerdzInject/current``
+- ``DependencyResolver``
+
 ### Registering
 
 - ``NerdzInject/registerObject(_:)``

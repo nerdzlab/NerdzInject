@@ -146,6 +146,57 @@ Both wrappers accept an `allowRegister` flag (default `false`). When it is `true
 service = MyService()
 ```
 
+## Testing
+
+The property wrappers resolve from `NerdzInject.current`, an ambient container that defaults to `NerdzInject.shared`. A wrapper captures `current` when its enclosing object is initialized, so you can give a test its own isolated container and an override sticks to any object built inside the scope. This keeps tests isolated from each other and from app wide registrations, with no manual cleanup.
+
+The primary API is `withDependencies`. The first closure registers dependencies into a fresh container, and the second runs your test against it.
+
+```swift
+import Testing
+import NerdzInject
+
+@Test func loadsProfile() {
+    withDependencies {
+        $0.registerObject(ProfileRepositorySpy(), for: ProfileRepository.self)
+    } operation: {
+        let sut = ProfileViewModel()   // captures the fresh container
+        sut.load()
+    }
+}
+```
+
+If you prefer not to wrap the whole body, add the `NerdzInjectTesting` product to your test target and apply the `.nerdzContainer` trait. Each test then runs with its own fresh container.
+
+```swift
+import Testing
+import NerdzInject
+import NerdzInjectTesting
+
+@Test(.nerdzContainer) func loadsProfile() {
+    NerdzInject.current.registerObject(ProfileRepositorySpy(), for: ProfileRepository.self)
+    let sut = ProfileViewModel()
+    sut.load()
+}
+```
+
+For teams that prefer explicit constructor injection over property wrappers, `NerdzInject` conforms to `DependencyResolver`. Take `any DependencyResolver` in an initializer (defaulting to `.shared`) and pass a test container in tests.
+
+```swift
+final class ProfileViewModel {
+    private let repository: ProfileRepository
+
+    init(resolver: DependencyResolver = .shared) {
+        self.repository = resolver.forceResolve()
+    }
+}
+
+// In a test
+let container = NerdzInject()
+container.registerObject(ProfileRepositorySpy(), for: ProfileRepository.self)
+let sut = ProfileViewModel(resolver: container)
+```
+
 ## Removing
 
 You can remove a registered object or closure by identifier or by type. The call returns `true` when something was removed.
