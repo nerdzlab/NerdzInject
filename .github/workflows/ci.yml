@@ -6,20 +6,26 @@ on:
   pull_request:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   test:
+    name: Build and test (Linux)
     runs-on: ubuntu-latest
     container: swift:6.0-jammy
     steps:
-      - uses: actions/checkout@v4
-      - name: Swift version
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show environment
         run: swift --version
+
       - name: Build
         run: swift build
+
       - name: Test
         run: swift test
-      - name: Strict concurrency build
-        run: swift build -Xswiftc -strict-concurrency=complete
+
+      - name: Build with complete strict concurrency
+        run: swift build --build-tests -Xswiftc -strict-concurrency=complete
