@@ -2,7 +2,7 @@
 
 NerdzInject is a small, pure Foundation library that makes it easy to use the Dependency Injection pattern in your Swift project. The shared container is thread-safe and `Sendable`, so you can register and resolve dependencies from any thread.
 
-[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://nerdzlab.github.io/NerdzInject/)
+[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://nerdzlab.github.io/NerdzInject/documentation/nerdzinject/)
 
 ## Requirements
 
