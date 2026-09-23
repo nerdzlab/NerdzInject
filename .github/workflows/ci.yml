@@ -6,20 +6,28 @@ on:
   pull_request:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   test:
+    name: Build and test (Linux)
     runs-on: ubuntu-latest
-    container: swift:6.0-jammy
+    # Swift 6.2 rather than the 6.0 the other libraries pin, because
+    # NerdzInjectTesting uses Swift Testing's TestScoping, added in 6.1.
+    container: swift:6.2-jammy
     steps:
-      - uses: actions/checkout@v4
-      - name: Swift version
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Show environment
         run: swift --version
+
       - name: Build
         run: swift build
+
       - name: Test
         run: swift test
-      - name: Strict concurrency build
-        run: swift build -Xswiftc -strict-concurrency=complete
+
+      - name: Build with complete strict concurrency
+        run: swift build --build-tests -Xswiftc -strict-concurrency=complete
