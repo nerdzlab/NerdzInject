@@ -1,153 +1,207 @@
-/// A class that registers and resolve all the dependencies
-public final class NerdzInject {
+/// A container that registers and resolves dependencies across an app.
+///
+/// `NerdzInject` stores registration closures in a registry guarded by a lock
+/// and hands back instances on demand. Register a value by its inferred type,
+/// by an explicit type, or by a string identifier, then read it back with
+/// ``resolve()``, ``forceResolve()``, or the ``Inject`` and ``ForceInject``
+/// property wrappers.
+///
+/// Use the shared registry through ``shared``.
+public final class NerdzInject: Sendable {
     private typealias RegistrationInfo = (isSingleton: Bool, closure: () -> Any)
-    
-    private var registrations: [String: RegistrationInfo] = [:]
-    
+
+    // The registry is guarded by `LockedState`, which is the only synchronization
+    // primitive in this package. Because this is an immutable `let` holding a
+    // `Sendable` value, `NerdzInject` is checked `Sendable` with no `@unchecked`.
+    private let registrations = LockedState<[String: RegistrationInfo]>([:])
+
     // MARK: - Singleton
-    
-    /// SIngleton instance of a class
+
+    /// The shared registry used throughout an app.
+    ///
+    /// Register and resolve dependencies through this instance. The ``Inject``
+    /// and ``ForceInject`` property wrappers resolve against this same registry.
     public static let shared = NerdzInject()
-    
+
     private init() { }
-    
-    // MARK: - Regiastering(Object)
-    
-    /// Register an object based on instance type
-    /// - Parameter object: Registered instance that needs to be resolved later 
+
+    // MARK: - Registering(Object)
+
+    /// Registers an existing object, resolvable by its own type.
+    /// - Parameter object: The instance to store for later resolution.
+    /// - Returns: The same `object`, so the call can be chained or assigned.
     @discardableResult
     public func registerObject<T>(_ object: T) -> T {
         register(closure: { object })
         return object
     }
-    
-    /// Register an object for another  type
-    /// Might be useful when you want to register child object to be resolved for all parent requests
+
+    /// Registers an existing object, resolvable by another type.
+    ///
+    /// Useful when a child instance should be resolved for every request of a
+    /// parent type.
     /// - Parameters:
-    ///   - object: Registered instance that needs to be resolved later 
-    ///   - type: A type to what this instance needs to be resolved
+    ///   - object: The instance to store for later resolution.
+    ///   - type: The type this instance resolves for.
+    /// - Returns: The same `object`, so the call can be chained or assigned.
     @discardableResult
     public func registerObject<T, V>(_ object: T, for type: V.Type) -> T {
         register(for: type) { object }
         return object
     }
-    
-    /// Register an object that might be 
+
+    /// Registers an existing object, resolvable by a string identifier.
     /// - Parameters:
-    ///   - object: Registered instance that needs to be resolved later
-    ///   - identifier: Unique dentifier that needs to be used for resolving instance in future
+    ///   - object: The instance to store for later resolution.
+    ///   - identifier: A unique identifier used to resolve the instance later.
+    /// - Returns: The same `object`, so the call can be chained or assigned.
     @discardableResult
     public func registerObject<T>(_ object: T, for identifier: String) -> T {
         register(for: identifier) { object }
         return object
     }
-    
+
     // MARK: - Registering(Closure)
-    
-    /// Lazy register of an instance based on instance type
-    /// The closure will be called on a moment when resolving is requested for instance type
+
+    /// Lazily registers a factory, resolvable by its inferred type.
+    ///
+    /// The closure runs the first time the instance is resolved, not when it is
+    /// registered.
     /// - Parameters:
-    ///   - singleton: If is enabled - instance that will be created after initial resolving, will be cached and used in future instead of creating a new one
-    ///   - closure: Closure that needs to create a new instance of a type
+    ///   - singleton: When `true`, the instance built on first resolution is
+    ///     cached and reused for later resolutions of the same key.
+    ///   - closure: A factory that creates a new instance of the type.
     public func register<T>(singleton: Bool = false, closure: @escaping () -> T) {
-        register(for: T.self, closure: closure)
+        register(singleton: singleton, for: T.self, closure: closure)
     }
-    
-    /// Lazy register of an instance based on provided type
-    /// The closure will be called on a moment when resolving is requested for instance type
+
+    /// Lazily registers a factory, resolvable by a provided type.
+    ///
+    /// The closure runs the first time the instance is resolved, not when it is
+    /// registered.
     /// - Parameters:
-    ///   - singleton: If is enabled - instance that will be created after initial resolving, will be cached and used in future instead of creating a new one
-    ///   - type: A type to what this instance needs to be resolved
-    ///   - closure: Closure that needs to create a new instance of a type
+    ///   - singleton: When `true`, the instance built on first resolution is
+    ///     cached and reused for later resolutions of the same key.
+    ///   - type: The type this instance resolves for.
+    ///   - closure: A factory that creates a new instance of the type.
     public func register<T, V>(singleton: Bool = false, for type: V.Type, closure: @escaping () -> T) {
         let identifier = String(describing: V.self)
-        register(for: identifier, closure: closure)
+        register(singleton: singleton, for: identifier, closure: closure)
     }
-    
-    /// Lazy register of an instance based on provided identifier
-    /// The closure will be called on a moment when resolving is requested for instance type
+
+    /// Lazily registers a factory, resolvable by a string identifier.
+    ///
+    /// The closure runs the first time the instance is resolved, not when it is
+    /// registered.
     /// - Parameters:
-    ///   - singleton: If is enabled - instance that will be created after initial resolving, will be cached and used in future instead of creating a new one
-    ///   - identifier: A unique identifier that needs to be used for resolving an instance
-    ///   - closure: Closure that needs to create a new instance of a type
+    ///   - singleton: When `true`, the instance built on first resolution is
+    ///     cached and reused for later resolutions of the same key.
+    ///   - identifier: A unique identifier used to resolve the instance later.
+    ///   - closure: A factory that creates a new instance of the type.
     public func register<T>(singleton: Bool = false, for identifier: String, closure: @escaping () -> T) {
-        registrations[identifier] = (singleton, closure: closure)
+        registrations.withLock { $0[identifier] = (singleton, closure: closure) }
     }
-    
+
     // MARK: - Resolving
-    
-    /// Resoving an instance based on type
-    /// - Returns: Resolved instance if such exist
+
+    /// Resolves an instance by its inferred type.
+    /// - Returns: The registered instance, or `nil` when nothing is registered
+    ///   for the type.
     public func resolve<T>() -> T? {
         let identifier = String(describing: T.self)
         return resolve(by: identifier)
     }
-    
-    /// Resolving an instance based on provided type
-    /// Return type might differ, for example if you know for sure that under registration type is a child instance 
-    /// - Parameter type: A type based on what library needs to resolve an instance
-    /// - Returns: Resolved instance if such exist
+
+    /// Resolves an instance by a provided type.
+    ///
+    /// The returned type may differ from `type`, for example when the registered
+    /// value is a child of the requested type.
+    /// - Parameter type: The type to resolve an instance for.
+    /// - Returns: The registered instance, or `nil` when nothing is registered
+    ///   for the type.
     public func resolve<T, V>(by type: V.Type) -> T? {
         let identifier = String(describing: V.self)
         return resolve(by: identifier)
     }
-    
-    /// Resolving an instance based on provided identifier
-    /// - Parameter identifier: An identifier that was used during instance registration
-    /// - Returns: Resolved instance if such exist
+
+    /// Resolves an instance by a string identifier.
+    /// - Parameter identifier: The identifier used when the instance was
+    ///   registered.
+    /// - Returns: The registered instance, or `nil` when nothing is registered
+    ///   for the identifier.
     public func resolve<T>(by identifier: String) -> T? {
-        guard let info = registrations[identifier] else {
+        // The factory closure is run OUTSIDE the lock, because `NSLock` is not
+        // recursive and a user factory may itself resolve dependencies. A benign
+        // race is possible on first resolve of a singleton (two callers may each
+        // build an instance), but that is acceptable: subsequent resolves are
+        // memoized to the winner's instance.
+        let info = registrations.withLock { $0[identifier] }
+
+        guard let info else {
             return nil
         }
-        
+
         guard let instance = info.closure() as? T else {
             return nil
         }
-        
+
         if info.isSingleton {
-            remove(by: identifier)
-            registerObject(instance, for: identifier)
+            registrations.withLock { $0[identifier] = (isSingleton: false, closure: { instance }) }
         }
-        
+
         return instance
     }
-    
+
     // MARK: - Force Resolving
-    
-    /// Force-resoving an instance based on type
-    /// - Returns: Resolved instance or crash
+
+    /// Resolves an instance by its inferred type, trapping when none exists.
+    ///
+    /// > Warning: This method crashes when nothing is registered for the type.
+    /// Prefer ``resolve()`` when a missing registration is possible.
+    /// - Returns: The registered instance.
     public func forceResolve<T>() -> T {
         resolve()!
     }
-    
-    /// Resolving an instance based on provided type
-    /// Return type might differ, for example if you know for sure that under registration type is a child instance 
-    /// - Parameter type: A type based on what library needs to resolve an instance
-    /// - Returns: Resolved instance or crash
+
+    /// Resolves an instance by a provided type, trapping when none exists.
+    ///
+    /// The returned type may differ from `type`, for example when the registered
+    /// value is a child of the requested type.
+    ///
+    /// > Warning: This method crashes when nothing is registered for the type.
+    /// Prefer ``resolve(by:)-(V.Type)`` when a missing registration is possible.
+    /// - Parameter type: The type to resolve an instance for.
+    /// - Returns: The registered instance.
     public func forceResolve<T, V>(by type: V.Type) -> T {
         resolve(by: type)!
     }
-    
-    /// Resolving an instance based on provided identifier
-    /// - Parameter identifier: An identifier that was used during instance registration
-    /// - Returns: Resolved instance or crash
+
+    /// Resolves an instance by a string identifier, trapping when none exists.
+    ///
+    /// > Warning: This method crashes when nothing is registered for the
+    /// identifier. Prefer ``resolve(by:)-(String)`` when a missing registration
+    /// is possible.
+    /// - Parameter identifier: The identifier used when the instance was
+    ///   registered.
+    /// - Returns: The registered instance.
     public func forceResolve<T>(by identifier: String) -> T {
         resolve(by: identifier)!
     }
-    
+
     // MARK: - Removing
-    
-    /// Removing registered instance if such exist
-    /// - Parameter identifier: An identifier with what an instance was registered
-    /// - Returns: `true` if removing was successful
+
+    /// Removes the registration for an identifier, when one exists.
+    /// - Parameter identifier: The identifier used when the instance was
+    ///   registered.
+    /// - Returns: `true` when a registration was removed, `false` otherwise.
     @discardableResult
     public func remove(by identifier: String) -> Bool {
-        registrations.removeValue(forKey: identifier) != nil
+        registrations.withLock { $0.removeValue(forKey: identifier) != nil }
     }
-    
-    /// Removing registered instance if such exist
-    /// - Parameter type: A type with what an instance was registered
-    /// - Returns: `true` if removing was successful
+
+    /// Removes the registration for a type, when one exists.
+    /// - Parameter type: The type used when the instance was registered.
+    /// - Returns: `true` when a registration was removed, `false` otherwise.
     @discardableResult
     public func remove<T>(by type: T.Type) -> Bool {
         let identifier = String(describing: T.self)
